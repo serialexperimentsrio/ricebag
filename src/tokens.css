@@ -1,0 +1,21 @@
+:root {
+  /* Colors */
+  --color-main: #141414;
+  --color-accent: #444444;
+  --color-bright: #f0f0f0;
+  --color-dim: #888888;
+  --color-danger: rgba(255, 133, 133, 0.16);
+  --color-backdrop: rgba(0, 0, 0, 0.3);
+
+  /* Z-index layers */
+  --z-box-content: 100;
+  --z-popover: 1000;
+  --z-modal: 9999;
+  --z-tooltip: 99999;
+  --z-toast: 999999;
+
+  /* Transitions */
+  --transition-fast: 0.1s ease;
+  --transition-base: 0.2s ease;
+  --transition-slow: 0.3s ease;
+}
