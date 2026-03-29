@@ -1,0 +1,22 @@
+.panel {
+	box-sizing: border-box;
+}
+
+.box {
+	width: 100%;
+	position: relative;
+	box-sizing: border-box;
+}
+
+.title {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-size: 1rem;
+	line-height: 1.2;
+	margin: 0;
+	padding-left: 4px;
+	margin-bottom: 8px;
+	color: var(--color-dim);
+	background: transparent !important;
+}
