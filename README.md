@@ -1,3 +1,5 @@
+<p align="center"><img src="ricebag.png" alt="ricebag" /></p>
+
 # ricebag
 
 **ricebag** is a React component library with custom property theming.
