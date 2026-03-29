@@ -1,0 +1,20 @@
+.dropdown {
+	width: 100%;
+}
+
+.dropdown > div {
+	cursor: pointer;
+	overflow: hidden;
+	white-space: nowrap;
+	position: relative;
+	padding: 13px 15px;
+	border-bottom: 2px solid var(--color-accent);
+}
+
+.dropdown > div > span {
+	transition: color var(--transition-slow), opacity var(--transition-slow);
+}
+
+.dropdown > div:last-child {
+	border: none;
+}
