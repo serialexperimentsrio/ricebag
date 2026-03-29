@@ -1,0 +1,28 @@
+.popover {
+	padding: 0;
+	margin: 0;
+	outline: none;
+	inset: unset;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	animation: none !important;
+	transition: none !important;
+}
+
+.popover:not(:popover-open) {
+	display: none !important;
+}
+
+.popover::backdrop {
+	display: none;
+}
+
+.popoverContent {
+	padding: 0;
+	color: var(--color-bright);
+	margin: 0;
+	width: 100%;
+	overflow: hidden;
+}
