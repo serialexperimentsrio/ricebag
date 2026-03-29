@@ -1,0 +1,16 @@
+.modalBackdrop {
+	position: fixed;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	background: transparent;
+	z-index: var(--z-modal);
+	pointer-events: none;
+	transition: background 0.25s ease;
+}
+
+.modalBackdrop.active {
+	background: var(--color-backdrop);
+	pointer-events: all;
+}
