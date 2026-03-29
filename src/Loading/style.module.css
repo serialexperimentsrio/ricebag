@@ -1,0 +1,36 @@
+.loadingAnimation {
+	position: absolute !important;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	user-select: none;
+}
+
+.loadingAnimation.inline {
+	position: relative;
+	left: 0;
+	top: 2px;
+	transform: none;
+}
+
+.loadingAnimation i {
+	position: relative;
+	top: -7px;
+	left: 3px;
+	content: '.';
+	color: var(--color-bright) !important;
+	font-size: 16px;
+	padding-right: 4px;
+	animation: loadingDot 0.4s ease infinite alternate-reverse;
+}
+
+@keyframes loadingDot {
+	from {
+		filter: drop-shadow(0 0 0 var(--color-bright));
+		opacity: 0.2;
+	}
+	to {
+		filter: drop-shadow(0 0 4px var(--color-bright));
+		opacity: 1;
+	}
+}
