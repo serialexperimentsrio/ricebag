@@ -1,0 +1,34 @@
+.tooltip {
+	pointer-events: none;
+	overflow: hidden;
+	position: fixed;
+	display: inline-block;
+	border: 2px solid var(--color-accent);
+	background-color: var(--color-main);
+	color: var(--color-bright);
+	box-shadow: 0 4px 12px color-mix(in srgb, var(--color-main) 30%, transparent);
+	z-index: var(--z-tooltip);
+	opacity: 1;
+	width: 0;
+	height: 0;
+}
+
+.tooltipInner {
+	white-space: nowrap;
+	padding: 4px 8px;
+	box-sizing: content-box;
+	width: auto;
+	position: absolute;
+}
+
+.tooltipInner.horizontal {
+	transform: translateY(-50%);
+	left: 0;
+	top: 50%;
+}
+
+.tooltipInner.vertical {
+	transform: translateX(-50%);
+	left: 50%;
+	top: 0;
+}
