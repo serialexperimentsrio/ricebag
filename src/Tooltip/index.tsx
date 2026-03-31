@@ -47,6 +47,7 @@ export function Tooltip({
 	const childRef = useRef<HTMLElement>(null)
 	const boxRef = useRef<HTMLDivElement>(null)
 	const tooltipSize = useRef({ width: 0, height: 0 })
+	const animationRef = useRef<Animation | null>(null)
 	const lastForceHideRef = useRef(forceHide)
 
 	useEffect(() => {
@@ -179,6 +180,7 @@ export function Tooltip({
 
 		if (!shouldShow) keyframes.reverse()
 
+		animationRef.current?.cancel()
 		const animation = boxRef.current.animate(
 			keyframes,
 			shouldShow
@@ -193,6 +195,7 @@ export function Tooltip({
 						fill: 'forwards'
 					}
 		)
+		animationRef.current = animation
 
 		// handle hide animation complete
 		if (!shouldShow) {
