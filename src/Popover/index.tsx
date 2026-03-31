@@ -69,13 +69,13 @@ function PopoverContent({
 
 			// Cancel the fill:forwards effect once open so the popover can
 			// resize naturally if its content changes after it's open.
-			animationRef.current.addEventListener('finish', () => {
+			animationRef.current.onfinish = () => {
 				if (popoverRef.current && open) {
 					animationRef.current?.cancel()
 					popoverRef.current.style.height = 'auto'
 					popoverRef.current.style.overflow = 'visible'
 				}
-			})
+			}
 		} else {
 			currentSize = openSizeRef.current || { width: 0, height: 0 }
 
@@ -88,9 +88,9 @@ function PopoverContent({
 
 			animationRef.current = popoverRef.current.animate(keyframes, POPOVER_CONFIG.animation)
 
-			animationRef.current.addEventListener('finish', () => {
+			animationRef.current.onfinish = () => {
 				if (onAnimationComplete) onAnimationComplete()
-			})
+			}
 		}
 		// popoverRef, actualContentRef, openSizeRef are stable refs — excluding them
 		// is intentional so this only re-runs when open/position/isMeasuring changes.

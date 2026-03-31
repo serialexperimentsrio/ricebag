@@ -1,6 +1,7 @@
 import { Loading } from '../Loading'
 import { useRef, useState } from 'react'
 import { Popover } from '../Popover'
+import type { PopoverPosition } from '../Popover/position'
 import style from './style.module.css'
 
 interface DropdownItem {
@@ -87,16 +88,19 @@ export function Dropdown({
 	children,
 	items,
 	above,
+	smartPositions,
 	onOpenChange
 }: {
 	children: React.ReactElement
 	items: DropdownItem[]
 	above?: boolean
+	smartPositions?: PopoverPosition[]
 	onOpenChange?: (open: boolean) => void
 }) {
 	return (
 		<Popover
 			above={above}
+			smartPositions={smartPositions}
 			onOpenChange={onOpenChange}
 			content={(closePopover) => (
 				<DropdownContent items={items} close={closePopover} />

@@ -48,6 +48,8 @@ export function Tooltip({
 	const boxRef = useRef<HTMLDivElement>(null)
 	const tooltipSize = useRef({ width: 0, height: 0 })
 	const animationRef = useRef<Animation | null>(null)
+	const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+	const innerRef = useRef<HTMLDivElement>(null)
 	const lastForceHideRef = useRef(forceHide)
 
 	useEffect(() => {
@@ -83,16 +85,11 @@ export function Tooltip({
 
 		const childRect = childRef.current.getBoundingClientRect()
 
-		if (tooltipSize.current.width === 0 && boxRef.current) {
-			const tooltip = boxRef.current.querySelector(
-				'div'
-			) as HTMLDivElement
-			if (tooltip) {
-				const boxRect = tooltip.getBoundingClientRect()
-				tooltipSize.current = {
-					width: Math.round(boxRect.width + 4),
-					height: Math.round(boxRect.height + 4)
-				}
+		if (tooltipSize.current.width === 0 && innerRef.current) {
+			const boxRect = innerRef.current.getBoundingClientRect()
+			tooltipSize.current = {
+				width: Math.round(boxRect.width + 4),
+				height: Math.round(boxRect.height + 4)
 			}
 		}
 
@@ -211,7 +208,7 @@ export function Tooltip({
 
 			// trigger a new render cycle with fresh positions
 			setVisible((v) => !v)
-			setTimeout(() => setVisible((v) => !v), 0)
+			scrollTimeoutRef.current = setTimeout(() => setVisible((v) => !v), 0)
 		}
 
 		// only add scroll listener when hovered or forceShow
@@ -223,6 +220,10 @@ export function Tooltip({
 			// clean up animations and scroll listeners
 			animation.cancel()
 			window.removeEventListener('scroll', updateOnScroll)
+			if (scrollTimeoutRef.current !== null) {
+				clearTimeout(scrollTimeoutRef.current)
+				scrollTimeoutRef.current = null
+			}
 		}
 	}, [hovered, forceShow, forceHide, above, left, right])
 
@@ -232,7 +233,7 @@ export function Tooltip({
 		(hovered || visible) &&
 		createPortal(
 			<div ref={boxRef} id={tooltipId} role="tooltip" className={style.tooltip}>
-				<div className={`${style.tooltipInner} ${isHorizontal ? style.horizontal : style.vertical}`}>
+				<div ref={innerRef} className={`${style.tooltipInner} ${isHorizontal ? style.horizontal : style.vertical}`}>
 					{text}
 				</div>
 			</div>,

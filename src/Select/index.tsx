@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { Dropdown } from '../Dropdown'
+import type { PopoverPosition } from '../Popover/position'
 import style from './style.module.css'
 
 export function Select({
 	options,
 	style: customStyle,
 	above,
+	smartPositions,
 	className
 }: {
 	options: {
@@ -16,6 +18,7 @@ export function Select({
 	}[]
 	style?: React.CSSProperties
 	above?: boolean
+	smartPositions?: PopoverPosition[]
 	className?: string
 }) {
 	const [optionName, setOptionName] = useState(
@@ -26,6 +29,7 @@ export function Select({
 	return (
 		<Dropdown
 			above={above}
+			smartPositions={smartPositions}
 			onOpenChange={setIsOpen}
 			items={options.map((option) => ({
 				key: option.key,
@@ -40,6 +44,13 @@ export function Select({
 				role="combobox"
 				aria-haspopup="listbox"
 				aria-expanded={isOpen}
+				tabIndex={0}
+				onKeyDown={(e) => {
+					if (e.key === 'Enter' || e.key === ' ') {
+						e.preventDefault()
+						e.currentTarget.click()
+					}
+				}}
 				className={`${style.selectTrigger} ${className}`}
 				style={customStyle}
 			>
