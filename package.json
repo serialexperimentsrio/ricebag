@@ -1,6 +1,6 @@
 {
   "name": "ricebag",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A React component library with CSS custom property theming",
   "keywords": [
     "react",
