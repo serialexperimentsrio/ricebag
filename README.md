@@ -1,3 +1,6 @@
+> [!WARNING]
+> Despite the repository description (About), this library is still in active development. Components may exhibit bugs or unintended behavior and are not yet recommended for production use.
+
 <p align="center"><img src="https://raw.githubusercontent.com/serialexperimentsrio/ricebag/main/ricebag.png" alt="ricebag" /></p>
 
 # ricebag
