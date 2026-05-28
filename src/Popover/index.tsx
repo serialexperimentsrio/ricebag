@@ -1,4 +1,3 @@
-import { Box } from '../Box'
 import React, { useEffect, useId, useRef, useState } from 'react'
 import style from './style.module.css'
 import {
@@ -19,7 +18,8 @@ function PopoverContent({
 	onAnimationComplete,
 	contentRef,
 	openSizeRef,
-	isMeasuring
+	isMeasuring,
+	matchTriggerWidth
 }: {
 	open: boolean
 	children: React.ReactNode
@@ -29,6 +29,7 @@ function PopoverContent({
 	contentRef?: React.RefObject<HTMLDivElement | null>
 	openSizeRef: React.RefObject<{ width: number; height: number } | null>
 	isMeasuring: boolean
+	matchTriggerWidth: boolean
 }) {
 	const internalContentRef = useRef<HTMLDivElement>(null)
 	const actualContentRef = contentRef || internalContentRef
@@ -54,7 +55,6 @@ function PopoverContent({
 			// so the height animation starts from 0 and expands to the right value.
 			currentSize = openSizeRef.current || { width: 0, height: 0 }
 
-			popoverRef.current.style.width = 'auto'
 			popoverRef.current.style.height = '0px'
 			popoverRef.current.style.overflow = 'hidden'
 
@@ -62,7 +62,8 @@ function PopoverContent({
 				position,
 				currentSize.height,
 				POPOVER_CONFIG.animationOffset.medium,
-				true
+				true,
+				matchTriggerWidth
 			)
 
 			animationRef.current = popoverRef.current.animate(keyframes, POPOVER_CONFIG.animation)
@@ -83,7 +84,8 @@ function PopoverContent({
 				position,
 				currentSize.height,
 				POPOVER_CONFIG.animationOffset.small,
-				false
+				false,
+				matchTriggerWidth
 			)
 
 			animationRef.current = popoverRef.current.animate(keyframes, POPOVER_CONFIG.animation)
@@ -120,6 +122,7 @@ export function Popover({
 	smartPositions,
 	defaultOpen = false,
 	noCloseOnClickOutside = false,
+	matchTriggerWidth = false,
 	style: customStyle,
 	onOpenChange
 }: {
@@ -132,6 +135,7 @@ export function Popover({
 	smartPositions?: PopoverPosition[]
 	defaultOpen?: boolean
 	noCloseOnClickOutside?: boolean
+	matchTriggerWidth?: boolean
 	style?: React.CSSProperties
 	onOpenChange?: (open: boolean) => void
 }) {
@@ -184,7 +188,7 @@ export function Popover({
 		setCurrentPosition(position)
 
 		const { viewportPadding: padding, triggerSpacing: spacing } = POPOVER_CONFIG
-		return createPositionStyle(position, rect, spacing, padding, scrollTop, scrollLeft, isFixed, size || undefined)
+		return createPositionStyle(position, rect, spacing, padding, scrollTop, scrollLeft, isFixed, size || undefined, matchTriggerWidth)
 	}
 
 	const openPopover = async () => {
@@ -204,7 +208,6 @@ export function Popover({
 			if (Object.keys(estimatedPosition).length === 0) return
 
 			setIsMeasuring(true)
-			setIsVisible(true)
 
 			// Force the popover invisible before showing it so the measurement
 			// pass never flickers on screen.
@@ -213,11 +216,11 @@ export function Popover({
 				width: 'auto',
 				height: 'auto',
 				overflow: 'visible',
-				visibility: 'hidden !important',
-				opacity: '0 !important',
+				visibility: 'hidden',
+				opacity: '0',
 				contain: 'layout style',
-				animation: 'none !important',
-				transition: 'none !important'
+				animation: 'none',
+				transition: 'none'
 			})
 
 			popoverRef.current.showPopover()
@@ -287,6 +290,7 @@ export function Popover({
 	}
 
 	const togglePopover = () => {
+		if (isMeasuring) return
 		if (isVisible) {
 			closePopover()
 		} else {
@@ -301,9 +305,10 @@ export function Popover({
 			if (!popoverRef.current || !childrenRef.current) return
 
 			// Reset size constraints so we measure the current natural size.
-			const resetStyles =
-				'width: auto; height: auto; minWidth: auto; minHeight: auto; maxWidth: none; maxHeight: none; overflow: visible;'
-			popoverRef.current.style.cssText += resetStyles
+			popoverRef.current.style.height = 'auto'
+			popoverRef.current.style.maxWidth = 'none'
+			popoverRef.current.style.maxHeight = 'none'
+			popoverRef.current.style.overflow = 'visible'
 			void popoverRef.current.offsetHeight
 
 			const rect = popoverRef.current.getBoundingClientRect()
@@ -328,7 +333,7 @@ export function Popover({
 			// the same direction so the popover doesn't jump sides on scroll/resize.
 			const positionStyle = createPositionStyle(
 				currentPosition, triggerRect, spacing, padding,
-				scrollTop, scrollLeft, isFixed, size
+				scrollTop, scrollLeft, isFixed, size, matchTriggerWidth
 			)
 			setPositionStyle(positionStyle)
 
@@ -398,7 +403,7 @@ export function Popover({
 	return (
 		<>
 			{triggerElement}
-			<Box
+			<div
 				ref={popoverRef}
 				popover="manual"
 				id={popoverId}
@@ -412,11 +417,12 @@ export function Popover({
 					contentRef={popoverContentRef}
 					openSizeRef={openSizeRef}
 					isMeasuring={isMeasuring}
+					matchTriggerWidth={matchTriggerWidth}
 					onAnimationComplete={!isOpen ? handleCloseAnimationComplete : undefined}
 				>
 					{contentElement}
 				</PopoverContent>
-			</Box>
+			</div>
 		</>
 	)
 }

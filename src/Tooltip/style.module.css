@@ -3,11 +3,10 @@
 	overflow: hidden;
 	position: fixed;
 	display: inline-block;
-	border: 2px solid var(--color-accent);
-	background-color: var(--color-main);
-	color: var(--color-bright);
-	box-shadow: 0 4px 12px color-mix(in srgb, var(--color-main) 30%, transparent);
-	z-index: var(--z-tooltip);
+	border: var(--rb-border-width, 1px) solid var(--rb-color-accent);
+	background-color: var(--rb-color-main);
+	color: var(--rb-color-bright);
+	z-index: var(--rb-z-tooltip);
 	opacity: 1;
 	width: 0;
 	height: 0;

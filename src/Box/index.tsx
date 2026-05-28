@@ -13,7 +13,6 @@ type ImageComponentProps = {
 type BoxProps = {
 	image?: string
 	icon?: string
-	shadowless?: boolean
 	imageComponent?: React.ComponentType<ImageComponentProps>
 } & HTMLAttributes<HTMLDivElement>
 
@@ -28,7 +27,7 @@ const defaultImageStyle: React.CSSProperties = {
 
 export const Box = forwardRef(
 	(
-		{ image, icon, shadowless, className, children, imageComponent, ...rest }: BoxProps,
+		{ image, icon, className, children, imageComponent, ...rest }: BoxProps,
 		ref: ForwardedRef<HTMLDivElement>
 	) => {
 		const Img = imageComponent ?? 'img'
@@ -37,7 +36,7 @@ export const Box = forwardRef(
 			<div
 				{...rest}
 				ref={ref}
-				className={`${style.box} ${shadowless ? '' : 'shadow'} ${className || ''}`}
+				className={`${style.box} ${className || ''}`}
 			>
 				{image && (
 					<Img

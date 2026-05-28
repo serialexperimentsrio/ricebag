@@ -102,6 +102,7 @@ export function Dropdown({
 			above={above}
 			smartPositions={smartPositions}
 			onOpenChange={onOpenChange}
+			matchTriggerWidth
 			content={(closePopover) => (
 				<DropdownContent items={items} close={closePopover} />
 			)}

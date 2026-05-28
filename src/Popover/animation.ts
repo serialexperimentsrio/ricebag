@@ -5,31 +5,34 @@ export const createAnimationKeyframes = (
 	position: PopoverPosition,
 	height: number,
 	offset: number,
-	isOpening: boolean
+	isOpening: boolean,
+	matchTriggerWidth: boolean = true
 ): Keyframe[] => {
 	const baseTransform = TRANSFORMS[position]
+	// Centered popovers use translateX(-50%) for horizontal centering — include
+	// it in every keyframe so the animation never strips the centering transform.
+	const centerPrefix = !matchTriggerWidth && (position === 'below' || position === 'above') ? 'translateX(-50%) ' : ''
 
-	// Slide direction is opposite to where the popover sits: a popover above
-	// the trigger slides upward to exit and slides down from offset to open.
 	const offsets = {
 		left: `translateX(${offset}px)`,
 		right: `translateX(-${offset}px)`,
 		above: `translateY(${offset}px)`,
 		below: `translateY(-${offset}px)`
 	}
-	const offsetTransform = `${baseTransform} ${offsets[position]}`
+	const offsetTransform = `${centerPrefix}${baseTransform} ${offsets[position]}`
+	const restTransform = `${centerPrefix}${baseTransform}`
 
 	const startFrame = {
 		height: isOpening ? '0px' : `${height}px`,
 		opacity: isOpening ? 0 : 1,
 		overflow: 'hidden' as const,
-		transform: isOpening ? offsetTransform : baseTransform
+		transform: isOpening ? offsetTransform : restTransform
 	}
 	const endFrame = {
 		height: isOpening ? `${height}px` : '0px',
 		opacity: isOpening ? 1 : 0,
 		overflow: 'hidden' as const,
-		transform: isOpening ? baseTransform : offsetTransform
+		transform: isOpening ? restTransform : offsetTransform
 	}
 	return [startFrame, endFrame]
 }

@@ -1,17 +1,15 @@
-import { flushSync } from 'react-dom'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import type { ToastBoxProps } from './ToastBox'
-import { ToastBox } from './ToastBox'
+import type { ToastBoxProps, ToastType } from './ToastBox'
+import ToastBox from './ToastBox'
 import style from './style.module.css'
 
 type XLocation = 'left' | 'right'
 type YLocation = 'top' | 'bottom'
 type ForceUpdateFn = (value: Record<string, never>) => void
 
+// global state for toast system
 let toasts: ToastBoxProps[] = []
-// `removedToasts` keeps height info for toasts mid-exit so the container
-// doesn't collapse before the fade-out animation finishes.
 let removedToasts: Record<string, number> = {}
 let fadedToasts: Record<string, boolean> = {}
 let xLocation: XLocation = 'right'
@@ -19,11 +17,15 @@ let yLocation: YLocation = 'bottom'
 let portalUpdateFn: ForceUpdateFn | null = null
 let portalInitialized = false
 let toastRoot: HTMLElement | null = null
+let hideToasts = false
 
+// helper to generate random id
 const generateId = () => Math.random().toString(36).substring(2, 9)
 
+// helper to force update the portal
 const updatePortal = () => portalUpdateFn?.({})
 
+// toast portal component to render toasts outside of normal DOM hierarchy
 const ToastPortalContent = ({
 	toasts,
 	removedToasts,
@@ -35,15 +37,17 @@ const ToastPortalContent = ({
 	xLocation: XLocation
 	yLocation: YLocation
 }) => {
+	// extend ToastBoxProps to include placeholder flag
 	type ExtendedToastBoxProps = ToastBoxProps & {
 		isPlaceholder?: boolean
 	}
 
-	// Merge live toasts with invisible placeholders for ones still animating out,
-	// so the stack doesn't jump when a toast is removed.
+	// create a combined list of all toasts (visible and placeholders)
 	const allToasts: ExtendedToastBoxProps[] = [...toasts]
 
+	// add placeholder entries for removed toasts
 	Object.entries(removedToasts).forEach(([id, height]) => {
+		// only add if not already in the list
 		if (!allToasts.some((t) => t.id === id)) {
 			allToasts.push({
 				id,
@@ -56,16 +60,17 @@ const ToastPortalContent = ({
 		}
 	})
 
-	// Total height drives the container's top offset so toasts stack from the edge inward.
+	// calculate total height of all toasts
 	const totalHeight = allToasts.reduce(
 		(acc, toast) => acc + toast.height + 10,
 		8
 	)
 
-	const toastList =
-		yLocation === 'top' ? [...allToasts].reverse() : [...allToasts]
+	// prepare the toast list in the right order
+	const toastList = yLocation === 'top' ? [...allToasts].reverse() : [...allToasts]
 
-	const providerStyle = {
+	// fix for first toast starting from target x offset
+	const providerStyle: React.CSSProperties = {
 		...(yLocation === 'bottom'
 			? { top: `calc(100% - ${totalHeight}px)` }
 			: { bottom: `calc(100% - ${totalHeight}px)` }),
@@ -74,10 +79,18 @@ const ToastPortalContent = ({
 	}
 
 	return (
-		<div className={style.toastProvider} style={providerStyle} aria-live="polite" aria-atomic="false">
+		<div
+			className={style.toastProvider}
+			role="status"
+			aria-live="polite"
+			aria-atomic="false"
+			style={{
+				...providerStyle,
+				display: hideToasts ? 'none' : undefined
+			}}
+		>
 			{toastList.map((toast) => {
-				// Render a hidden placeholder instead of nothing so the layout
-				// holds its space while the toast fades out.
+				// if it's a placeholder or a faded toast, render an invisible placeholder
 				if (
 					(toast as ExtendedToastBoxProps).isPlaceholder ||
 					fadedToasts[toast.id]
@@ -85,6 +98,7 @@ const ToastPortalContent = ({
 					return (
 						<div
 							key={toast.id}
+							className="toast-placeholder"
 							style={{
 								height: `${toast.height}px`,
 								margin: '10px',
@@ -97,28 +111,40 @@ const ToastPortalContent = ({
 					)
 				}
 
+				// otherwise render the actual toast
 				return <ToastBox key={toast.id} {...toast} />
 			})}
 		</div>
 	)
 }
 
+// function to set toast location
 export const setToastLocation = (x: XLocation, y: YLocation) => {
 	xLocation = x
 	yLocation = y
 }
 
+// function to set toast visibility
+export const setToastVisibility = (visible: boolean) => {
+	hideToasts = !visible
+	updatePortal()
+}
+
+// function to initialize the toast portal
 const initToastPortal = () => {
 	if (typeof document === 'undefined' || portalInitialized) return
 
+	// create a single toast root element directly in body
 	toastRoot = document.createElement('div')
 	toastRoot.id = 'toast-portal'
 	document.body.appendChild(toastRoot)
 
+	// create a component to manage toast updates
 	const ToastUpdater = () => {
 		const [, forceUpdate] = useState({})
 		const mountedRef = useRef(false)
 
+		// store the update function for external use
 		useEffect(() => {
 			portalUpdateFn = forceUpdate
 			return () => {
@@ -133,28 +159,6 @@ const initToastPortal = () => {
 			}
 		}, [])
 
-		const allToastsFadedOut = useCallback(() => {
-			return (
-				toasts.length === 0 &&
-				Object.keys(removedToasts).length === 0 &&
-				Object.keys(fadedToasts).length > 0
-			)
-		}, [])
-
-		// Once every toast has faded out, clear the faded set on the next
-		// double-rAF so we don't wipe state before animations are truly done.
-		useEffect(() => {
-			if (allToastsFadedOut()) {
-				const frameId = requestAnimationFrame(() => {
-					requestAnimationFrame(() => {
-						fadedToasts = {}
-						forceUpdate({})
-					})
-				})
-				return () => cancelAnimationFrame(frameId)
-			}
-		}, [allToastsFadedOut])
-
 		return (
 			<ToastPortalContent
 				toasts={toasts}
@@ -165,21 +169,25 @@ const initToastPortal = () => {
 		)
 	}
 
+	// render the toast updater directly into the toast root
 	if (toastRoot) createRoot(toastRoot).render(<ToastUpdater />)
 
 	portalInitialized = true
 }
 
+// function to clean up toast state
 const cleanupToasts = (immediate = false) => {
+	// clear toasts immediately
 	toasts = []
 	updatePortal()
 
+	// if immediate cleanup requested, clear everything now
 	if (immediate) {
 		removedToasts = {}
 		fadedToasts = {}
 		updatePortal()
 	} else {
-		// Defer cleanup by two frames so exit animations can finish painting.
+		// otherwise mark for cleanup on next animation frame
 		requestAnimationFrame(() => {
 			requestAnimationFrame(() => {
 				removedToasts = {}
@@ -190,66 +198,79 @@ const cleanupToasts = (immediate = false) => {
 	}
 }
 
+// function to handle removing a toast globally
 const handleRemoveToast = (id: string) => {
 	const toastToRemove = toasts.find((t) => t.id === id)
 	if (!toastToRemove) return
 
+	// mark this toast as faded and store its height
 	fadedToasts = { ...fadedToasts, [id]: true }
 	removedToasts = { ...removedToasts, [id]: toastToRemove.height }
 	updatePortal()
 
+	// check if all toasts are now faded
 	const allToastsFaded = toasts.every(
 		(toast) => fadedToasts[toast.id] || toast.id === id
 	)
 
+	// if all toasts are faded, schedule a cleanup
 	if (allToastsFaded) {
 		cleanupToasts()
 	}
 }
 
-export const toast = (content: string) => {
-	// Defer to the next frame so the DOM is ready to measure height.
+// exported function to add a toast
+export const popToast = (content: string, type?: ToastType) => {
+	// use requestAnimationFrame to ensure DOM is ready
 	requestAnimationFrame(() => {
-		// Render off-screen into a hidden container to measure the real height
-		// before adding to the stack, so the container offset is correct from
-		// the moment the toast appears. flushSync makes the render synchronous
-		// so we can measure immediately after.
+		// create a temporary element to measure the height
+		// SECURITY: Use textContent instead of innerHTML to prevent potential XSS
 		const tempId = generateId()
-		const t = document.createElement('div')
-		t.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;pointer-events:none;'
-		document.body.appendChild(t)
+		// Render component for height measurement without innerHTML
+		const tempContainer = document.createElement('div')
+		tempContainer.style.position = 'absolute'
+		tempContainer.style.visibility = 'hidden'
+		tempContainer.style.width = '300px'
+		const tempRoot = createRoot(tempContainer)
+		document.body.appendChild(tempContainer)
 
-		const root = createRoot(t)
-		flushSync(() => {
-			root.render(
-				<ToastBox
-					text={content}
-					closing={false}
-					height={200}
-					id={tempId}
-					closeAt={new Date(Date.now() + 5000)}
-				/>
-			)
+		// Render the component to measure its height
+		tempRoot.render(
+			<ToastBox
+				text={content}
+				closing={false}
+				height={200}
+				id={tempId}
+				closeAt={new Date(Date.now() + 1500)}
+				type={type}
+			/>
+		)
+
+		// Use requestAnimationFrame to ensure rendering is complete
+		requestAnimationFrame(() => {
+			// Get the actual ToastBox element inside the container
+			const toastElement = tempContainer.firstElementChild as HTMLElement
+			const boxHeight = toastElement ? toastElement.offsetHeight : 50
+			tempRoot.unmount()
+			tempContainer.remove()
+
+			// create and add the new toast
+			const id = generateId()
+			toasts = [
+				...toasts,
+				{
+					id,
+					closeAt: new Date(Date.now() + 2500),
+					closing: false,
+					height: boxHeight,
+					text: content,
+					type,
+					onRemove: handleRemoveToast
+				}
+			]
+
+			updatePortal()
 		})
-
-		const height = t.getBoundingClientRect().height
-		root.unmount()
-		t.remove()
-
-		const id = generateId()
-		toasts = [
-			...toasts,
-			{
-				id,
-				closeAt: new Date(Date.now() + 5000),
-				closing: false,
-				height,
-				text: content,
-				onRemove: handleRemoveToast
-			}
-		]
-
-		updatePortal()
 	})
 }
 

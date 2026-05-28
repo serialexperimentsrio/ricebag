@@ -18,7 +18,7 @@ export function Panel({
 				<span>{title}</span>
 				{titleExtra}
 			</div>
-			<Box className={style.box} shadowless {...rest}>
+			<Box className={style.box} {...rest}>
 				{children}
 			</Box>
 		</div>

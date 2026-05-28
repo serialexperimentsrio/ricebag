@@ -10,8 +10,9 @@
     "sourceMap": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "rootDir": "src"
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "declarations.d.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/declarations.d.ts"],
   "exclude": ["dist", "node_modules"]
 }

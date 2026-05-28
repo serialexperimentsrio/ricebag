@@ -5,12 +5,12 @@
 	right: 0;
 	bottom: 0;
 	background: transparent;
-	z-index: var(--z-modal);
+	z-index: var(--rb-z-modal);
 	pointer-events: none;
 	transition: background 0.25s ease;
 }
 
 .modalBackdrop.active {
-	background: var(--color-backdrop);
+	background: var(--rb-color-backdrop);
 	pointer-events: all;
 }

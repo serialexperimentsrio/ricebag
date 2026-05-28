@@ -6,10 +6,9 @@
 	max-width: calc(100vw - 70px);
 	max-height: calc(100vh - 70px);
 	overflow: hidden;
-	z-index: var(--z-modal);
+	z-index: var(--rb-z-modal);
 	padding: 0;
 	border: none !important;
-	box-shadow: inset 0 0 0 2px var(--color-accent);
 }
 
 .innerModal {

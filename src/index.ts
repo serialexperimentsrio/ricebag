@@ -14,6 +14,6 @@ export { setModal, hideModal, openPreviousModal, registerCloseAnimation, isModal
 export { ModalBox } from './Modal/ModalBox'
 export type { ModalBoxProps, ModalBoxComponent } from './Modal/ModalBox'
 
-export { toast, setToastLocation } from './Toast'
-export { ToastBox } from './Toast/ToastBox'
+export { popToast as toast, setToastLocation, setToastVisibility } from './Toast'
+export { default as ToastBox } from './Toast/ToastBox'
 export type { ToastBoxProps } from './Toast/ToastBox'
