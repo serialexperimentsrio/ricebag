@@ -50,6 +50,31 @@ export function Tooltip({
 	const animationRef = useRef<Animation | null>(null)
 	const innerRef = useRef<HTMLDivElement>(null)
 	const lastForceHideRef = useRef(forceHide)
+	const scrollingRef = useRef(false)
+
+	// Scrolling moves the trigger away from where the tooltip was placed, so hide
+	// it, then show it again once scrolling settles if the pointer is still over
+	// the trigger. Capture phase also catches scrolls inside overflow containers,
+	// which never reach a plain window listener.
+	useEffect(() => {
+		let settleTimer: ReturnType<typeof setTimeout>
+		const onScroll = () => {
+			scrollingRef.current = true
+			animationRef.current?.cancel()
+			setHovered(false)
+			setVisible(false)
+			clearTimeout(settleTimer)
+			settleTimer = setTimeout(() => {
+				scrollingRef.current = false
+				if (childRef.current?.matches(':hover')) setHovered(true)
+			}, 150)
+		}
+		window.addEventListener('scroll', onScroll, { capture: true, passive: true })
+		return () => {
+			window.removeEventListener('scroll', onScroll, { capture: true })
+			clearTimeout(settleTimer)
+		}
+	}, [])
 
 	useEffect(() => {
 		setVisible(true)
@@ -198,22 +223,8 @@ export function Tooltip({
 			animation.onfinish = () => setVisible(false)
 		}
 
-		// Scrolling moves the trigger away from where the tooltip was placed, so
-		// hide it. Listening in the capture phase also catches scrolls inside
-		// containers (overflow: auto), which never reach a window listener.
-		const hideOnScroll = () => {
-			animation.cancel()
-			setHovered(false)
-			setVisible(false)
-		}
-
-		if (shouldShow) {
-			window.addEventListener('scroll', hideOnScroll, { capture: true, passive: true })
-		}
-
 		return () => {
 			animation.cancel()
-			window.removeEventListener('scroll', hideOnScroll, { capture: true })
 		}
 	}, [hovered, forceShow, forceHide, above, left, right])
 
@@ -268,7 +279,8 @@ export function Tooltip({
 
 		// add mouse handlers
 		onMouseEnter: (e: React.MouseEvent) => {
-			setHovered(true)
+			// while scrolling, the settle timer shows the tooltip instead
+			if (!scrollingRef.current) setHovered(true)
 
 			// call original
 			if (children.props.onMouseEnter) {
