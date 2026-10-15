@@ -9,27 +9,25 @@
 
 .button {
 	background: var(--rb-color-main);
-	border: var(--rb-border-width, 1px) solid var(--rb-color-accent);
-	border-radius: var(--rb-border-radius, 0px);
-	padding: var(--rb-button-padding, 10px 20px);
+	border: var(--rb-border-width) solid var(--rb-color-accent);
+	padding: 10px 20px;
 	outline: none;
 	color: var(--rb-color-bright);
 	position: relative;
-	transition: background var(--rb-transition-fast), color 0.5s ease, transform var(--rb-transition-fast);
+	transition: background var(--rb-transition-fast), color 0.5s ease;
 	cursor: pointer;
-	font-size: var(--rb-font-size-base, 1rem);
-	font-family: var(--rb-font-family, inherit);
+	font-size: 1rem;
+	/* Buttons don't inherit the page font by default */
+	font-family: inherit;
 	user-select: none;
 }
 
 .button:hover:not(:disabled):not(.loading) {
-	background: color-mix(in srgb, var(--rb-color-backdrop) 70%, var(--rb-color-main) 30%);
-	transform: var(--rb-button-hover-transform, none);
+	background: var(--rb-color-accent);
 }
 
 .button:active:not(:disabled):not(.loading) {
 	opacity: 0.85;
-	transform: var(--rb-button-active-transform, none);
 }
 
 .button:focus-visible {
@@ -47,10 +45,10 @@
 .button::before {
 	content: '';
 	position: absolute;
-	bottom: calc(var(--rb-separator-width, 2px) * -1);
-	left: calc(var(--rb-separator-width, 2px) * -1);
-	right: calc(var(--rb-separator-width, 2px) * -1);
-	height: var(--rb-separator-width, 2px);
+	bottom: calc(var(--rb-border-width) * -1);
+	left: calc(var(--rb-border-width) * -1);
+	right: calc(var(--rb-border-width) * -1);
+	height: var(--rb-border-width);
 	animation: loading 2s ease infinite;
 	background: linear-gradient(
 		90deg,
@@ -66,7 +64,7 @@
 }
 
 .button::before {
-	top: calc(var(--rb-separator-width, 2px) * -1);
+	top: calc(var(--rb-border-width) * -1);
 	transform: scale(-1);
 	animation-delay: 1s;
 }
@@ -82,10 +80,10 @@
 }
 
 .button.danger {
-	border: var(--rb-border-width, 1px) solid var(--rb-color-accent);
+	border: var(--rb-border-width) solid var(--rb-color-accent);
 	background: color-mix(in srgb, var(--rb-color-danger) 22%, var(--rb-color-main));
 }
 
 .button.danger:hover:not(:disabled):not(.loading) {
-	background: color-mix(in srgb, var(--rb-color-backdrop) 60%, var(--rb-color-danger) 40%);
+	background: color-mix(in srgb, var(--rb-color-danger) 22%, var(--rb-color-accent));
 }

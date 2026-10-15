@@ -9,6 +9,8 @@
 	z-index: var(--rb-z-modal);
 	padding: 0;
 	border: none !important;
+	/* The modal's border (the real border is forced off above) */
+	box-shadow: inset 0 0 0 var(--rb-border-width) var(--rb-color-accent);
 }
 
 .innerModal {

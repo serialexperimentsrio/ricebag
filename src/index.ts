@@ -1,3 +1,5 @@
+// Default theme values, bundled into ricebag/styles.css
+import './tokens.css'
 
 export { Box } from './Box'
 export { Button } from './Button'

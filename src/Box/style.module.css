@@ -1,16 +1,16 @@
 .box {
 	background: var(--rb-color-main);
-	border: var(--rb-border-width, 1px) solid var(--rb-color-accent);
-	border-radius: var(--rb-border-radius, 0px);
-	padding: var(--rb-box-padding, 20px);
+	border: var(--rb-border-width) solid var(--rb-color-accent);
+	padding: 20px;
 	position: relative;
 	overflow: hidden;
-	transition: transform var(--rb-transition-base), background var(--rb-transition-base);
+	transition: background var(--rb-transition-base);
 }
 
 .box * {
 	position: relative;
-	z-index: var(--rb-z-box-content);
+	/* Keep content above the background image and icon */
+	z-index: 100;
 }
 
 .box .loadingAnimation {

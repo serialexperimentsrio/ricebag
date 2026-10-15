@@ -47,32 +47,34 @@ All visual properties are driven by CSS custom properties. The defaults shipped 
 
 ```css
 :root {
-  --color-main: #141414;       /* component backgrounds */
-  --color-accent: #444444;     /* borders, hover states */
-  --color-bright: #f0f0f0;     /* primary text, glow effects */
-  --color-dim: #888888;        /* muted/disabled text */
-  --color-danger: rgba(255, 133, 133, 0.16);  /* danger state border */
-  --color-backdrop: rgba(0, 0, 0, 0.3);       /* modal overlay */
+  --rb-color-main: #141414;     /* component backgrounds */
+  --rb-color-accent: #444444;   /* borders, hover states */
+  --rb-color-bright: #f0f0f0;   /* primary text */
+  --rb-color-dim: #888888;      /* muted/disabled text */
+  --rb-color-danger: rgba(255, 133, 133, 0.16);  /* danger tint */
+  --rb-color-warning: rgba(255, 200, 0, 0.16);   /* warning tint */
+  --rb-color-success: rgba(0, 200, 100, 0.16);   /* success tint */
+  --rb-color-backdrop: rgba(0, 0, 0, 0.3);       /* modal overlay */
 
-  --z-box-content: 100;
-  --z-popover: 1000;
-  --z-modal: 9999;
-  --z-tooltip: 99999;
-  --z-toast: 999999;
+  --rb-border-width: 2px;
 
-  --transition-fast: 0.1s ease;
-  --transition-base: 0.2s ease;
-  --transition-slow: 0.3s ease;
+  --rb-z-popover: 1000;
+  --rb-z-modal: 2000;
+  --rb-z-tooltip: 3000;
+  --rb-z-toast: 4000;
+
+  --rb-transition-fast: 0.12s ease;
+  --rb-transition-base: 0.24s ease;
 }
 ```
 
-To override any variable, redefine it in your own global CSS after importing `ricebag/styles.css`:
+Components use the page's font. To override any variable, redefine it on `:root` (or any element) in your own CSS. The defaults have zero specificity, so your values win regardless of load order:
 
 ```css
 :root {
-  --color-main: #1a1a2e;
-  --color-accent: #2a2a4a;
-  --color-bright: #ffffff;
+  --rb-color-main: #1a1a2e;
+  --rb-color-accent: #2a2a4a;
+  --rb-color-bright: #ffffff;
 }
 ```
 
@@ -80,9 +82,13 @@ You can also scope overrides to a specific part of your app:
 
 ```css
 .sidebar {
-  --color-main: #0d0d0d;
+  --rb-color-main: #0d0d0d;
 }
 ```
+
+### Upgrading from 0.1.x
+
+0.2.0 prefixes every variable with `rb-` so ricebag's names can't collide with your app's own. Rename `--color-*`, `--z-*` and `--transition-*` to `--rb-color-*`, `--rb-z-*` and `--rb-transition-*`. `--z-box-content` and `--transition-slow` were removed.
 
 ## Browser Requirements
 

@@ -1,32 +1,24 @@
-:root {
+/* Default theme, bundled into ricebag/styles.css. :where() gives these zero
+   specificity, so an app's own :root values always win, even though the JS
+   bundle also injects this CSS at the end of <head> at runtime. */
+:where(:root) {
 	/* Colors */
-	--rb-color-main: #0021f5;
-	--rb-color-accent: #4d64f8;
-	--rb-color-bright: #ffffff;
-	--rb-color-dim: rgba(255, 255, 255, 0.5);
-	--rb-color-danger: rgba(255, 133, 133, 0.16);
-	--rb-color-backdrop: rgba(0, 33, 245, 0.2);
+	--rb-color-main: #141414; /* component backgrounds */
+	--rb-color-accent: #444444; /* borders, hover states */
+	--rb-color-bright: #f0f0f0; /* primary text */
+	--rb-color-dim: #888888; /* muted/disabled text */
+	--rb-color-danger: rgba(255, 133, 133, 0.16); /* danger tint */
+	--rb-color-warning: rgba(255, 200, 0, 0.16); /* warning tint */
+	--rb-color-success: rgba(0, 200, 100, 0.16); /* success tint */
+	--rb-color-backdrop: rgba(0, 0, 0, 0.3); /* modal overlay */
 
-	/* Design Tokens */
 	--rb-border-width: 2px;
-	--rb-separator-width: 2px;
-	--rb-border-radius: 0px;
-	--rb-font-family: "Rubik", "Segoe UI", sans-serif;
-	--rb-font-size-base: 1rem;
-
-	--rb-button-padding: 10px 18px;
-	--rb-button-hover-transform: none;
-	--rb-button-active-transform: none;
-
-	--rb-box-padding: 22px;
-	--rb-select-padding: 10px 14px;
 
 	/* Z-index layers */
-	--rb-z-box-content: 100;
 	--rb-z-popover: 1000;
 	--rb-z-modal: 2000;
-	--rb-z-toast: 4000;
 	--rb-z-tooltip: 3000;
+	--rb-z-toast: 4000;
 
 	/* Transitions */
 	--rb-transition-fast: 0.12s ease;

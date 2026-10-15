@@ -48,7 +48,6 @@ export function Tooltip({
 	const boxRef = useRef<HTMLDivElement>(null)
 	const tooltipSize = useRef({ width: 0, height: 0 })
 	const animationRef = useRef<Animation | null>(null)
-	const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 	const innerRef = useRef<HTMLDivElement>(null)
 	const lastForceHideRef = useRef(forceHide)
 
@@ -199,31 +198,22 @@ export function Tooltip({
 			animation.onfinish = () => setVisible(false)
 		}
 
-		// handle scroll updates
-		const updateOnScroll = () => {
-			if (!childRef.current || !boxRef.current) return
-
-			// force animation to rerun with new position
+		// Scrolling moves the trigger away from where the tooltip was placed, so
+		// hide it. Listening in the capture phase also catches scrolls inside
+		// containers (overflow: auto), which never reach a window listener.
+		const hideOnScroll = () => {
 			animation.cancel()
-
-			// trigger a new render cycle with fresh positions
-			setVisible((v) => !v)
-			scrollTimeoutRef.current = setTimeout(() => setVisible((v) => !v), 0)
+			setHovered(false)
+			setVisible(false)
 		}
 
-		// only add scroll listener when hovered or forceShow
 		if (shouldShow) {
-			window.addEventListener('scroll', updateOnScroll, { passive: true })
+			window.addEventListener('scroll', hideOnScroll, { capture: true, passive: true })
 		}
 
 		return () => {
-			// clean up animations and scroll listeners
 			animation.cancel()
-			window.removeEventListener('scroll', updateOnScroll)
-			if (scrollTimeoutRef.current !== null) {
-				clearTimeout(scrollTimeoutRef.current)
-				scrollTimeoutRef.current = null
-			}
+			window.removeEventListener('scroll', hideOnScroll, { capture: true })
 		}
 	}, [hovered, forceShow, forceHide, above, left, right])
 

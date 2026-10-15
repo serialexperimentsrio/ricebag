@@ -1,5 +1,14 @@
 @import "../../src/tokens.css";
 
+/* Demo theme, overriding the neutral defaults */
+:root {
+  --rb-color-main: #0021f5;
+  --rb-color-accent: #4d64f8;
+  --rb-color-bright: #ffffff;
+  --rb-color-dim: rgba(255, 255, 255, 0.5);
+  --rb-color-backdrop: rgba(0, 33, 245, 0.2);
+}
+
 * {
   font-weight: 400;
   font-style: normal;
@@ -10,7 +19,7 @@ body {
   padding: 0;
   background-color: var(--rb-color-main);
   color: var(--rb-color-bright);
-  font-family: var(--rb-font-family);
+  font-family: "Rubik", "Segoe UI", sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;

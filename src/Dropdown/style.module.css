@@ -2,7 +2,7 @@
 	width: 100%;
 	box-sizing: border-box;
 	background: var(--rb-color-main);
-	border: var(--rb-border-width, 2px) solid var(--rb-color-accent);
+	border: var(--rb-border-width) solid var(--rb-color-accent);
 }
 
 .dropdown > div {
@@ -11,7 +11,7 @@
 	white-space: nowrap;
 	position: relative;
 	padding: 13px 15px;
-	border-bottom: var(--rb-separator-width, 2px) solid var(--rb-color-accent);
+	border-bottom: var(--rb-border-width) solid var(--rb-color-accent);
 	transition: background var(--rb-transition-fast), color var(--rb-transition-base), opacity var(--rb-transition-base);
 }
 
@@ -21,11 +21,7 @@
 
 .dropdown > div:hover,
 .dropdown > div:focus-visible {
-	background: color-mix(in srgb, var(--rb-color-backdrop) 65%, var(--rb-color-bright) 10%);
-}
-
-.dropdown > div:active {
-	background: color-mix(in srgb, var(--rb-color-backdrop) 70%, var(--rb-color-bright) 16%);
+	background: var(--rb-color-accent);
 }
 
 .dropdown > div:last-child {

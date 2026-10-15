@@ -4,6 +4,12 @@ import styles from './style.module.css'
 
 export type ToastType = 'default' | 'error' | 'success' | 'warning' | 'info'
 
+// How long a toast stays fully visible, then how long it takes to fade out
+export const DISPLAY_MS = 2500
+const FADE_MS = 5000
+// Hovering again after the fade has started gives the toast this long before fading again
+const RESUME_MS = 1500
+
 export interface ToastBoxProps {
 	id: string
 	closeAt: Date
@@ -12,6 +18,26 @@ export interface ToastBoxProps {
 	text: string
 	type?: ToastType
 	onRemove?: (id: string) => void
+}
+
+// Background and border per type, each tinting the theme's main/accent colours
+const TYPE_STYLES: Partial<Record<ToastType, React.CSSProperties>> = {
+	error: {
+		background: 'color-mix(in srgb, var(--rb-color-danger) 40%, var(--rb-color-main))',
+		borderColor: 'color-mix(in srgb, var(--rb-color-danger) 80%, var(--rb-color-accent))'
+	},
+	warning: {
+		background: 'color-mix(in srgb, var(--rb-color-warning) 40%, var(--rb-color-main))',
+		borderColor: 'color-mix(in srgb, var(--rb-color-warning) 80%, var(--rb-color-accent))'
+	},
+	success: {
+		background: 'color-mix(in srgb, var(--rb-color-success) 40%, var(--rb-color-main))',
+		borderColor: 'color-mix(in srgb, var(--rb-color-success) 80%, var(--rb-color-accent))'
+	},
+	info: {
+		background: 'color-mix(in srgb, var(--rb-color-accent) 40%, var(--rb-color-main))',
+		borderColor: 'var(--rb-color-accent)'
+	}
 }
 
 export default function ToastBox(props: ToastBoxProps) {
@@ -25,22 +51,20 @@ export default function ToastBox(props: ToastBoxProps) {
 	const startClosing = () => {
 		setIsClosing(true)
 
-		// remove the toast after a delay that matches the CSS transition
+		// Remove once the fade has finished, plus a short buffer
 		if (props.onRemove) {
 			const onRemove = props.onRemove
 			removeTimeoutRef.current = setTimeout(() => {
 				setIsAnimationComplete(true)
 				onRemove(props.id)
-			}, 5300) // 5s transition + 300ms buffer
+			}, FADE_MS + 300)
 		}
 	}
 
+	// Runs once: re-running on every parent render would restart the timer
 	useEffect(() => {
-		// set initial timeout to start the closing animation
 		const remaining = props.closeAt.getTime() - Date.now()
-		closeTimeoutRef.current = setTimeout(() => {
-			startClosing()
-		}, Math.max(0, remaining))
+		closeTimeoutRef.current = setTimeout(startClosing, Math.max(0, remaining))
 
 		return () => {
 			if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current)
@@ -56,25 +80,7 @@ export default function ToastBox(props: ToastBoxProps) {
 	}
 
 	const handleMouseLeave = () => {
-		// restart the timeout when mouse leaves
-		closeTimeoutRef.current = setTimeout(() => {
-			startClosing()
-		}, 1500)
-	}
-
-	const getToastStyles = (): React.CSSProperties => {
-		switch (props.type) {
-			case 'error':
-				return { background: 'color-mix(in srgb, var(--rb-color-danger) 40%, var(--rb-color-main))', borderColor: 'color-mix(in srgb, var(--rb-color-danger) 80%, var(--rb-color-accent))' }
-			case 'warning':
-				return { background: 'color-mix(in srgb, rgba(255,200,0,0.15) 60%, var(--rb-color-main))', borderColor: 'rgba(255,200,0,0.5)' }
-			case 'success':
-				return { background: 'color-mix(in srgb, rgba(0,200,100,0.15) 60%, var(--rb-color-main))', borderColor: 'rgba(0,200,100,0.5)' }
-			case 'info':
-				return { background: 'color-mix(in srgb, var(--rb-color-backdrop) 60%, var(--rb-color-main))', borderColor: 'var(--rb-color-accent)' }
-			default:
-				return {}
-		}
+		closeTimeoutRef.current = setTimeout(startClosing, RESUME_MS)
 	}
 
 	return (
@@ -85,7 +91,8 @@ export default function ToastBox(props: ToastBoxProps) {
 			className={`${styles.toast} ${isClosing ? styles.closing : ''}`}
 			style={{
 				pointerEvents: isAnimationComplete ? 'none' : 'auto',
-				...getToastStyles()
+				transition: isClosing ? `opacity ${FADE_MS}ms linear` : undefined,
+				...(props.type ? TYPE_STYLES[props.type] : undefined)
 			}}
 		>
 			<p>{props.text}</p>

@@ -58,7 +58,7 @@ export const ModalBox = ({
 			const fin = finalStyles()
 			const width = parseFloat(fin.width)
 			animateOuterModal(
-				{ width: `${width}px`, height: 0, filter: getInitialFilter() },
+				{ width: `${width}px`, height: 0, boxShadow: '0 0 0 0 transparent', filter: getInitialFilter() },
 				fin
 			)
 		}

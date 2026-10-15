@@ -4,24 +4,19 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: var(--rb-select-padding, 10px 15px);
+	padding: 10px 15px;
 	gap: 10px;
-	border: var(--rb-border-width, 1px) solid var(--rb-color-accent);
-	border-radius: var(--rb-border-radius, 0px);
-	transition: background var(--rb-transition-base), border-color var(--rb-transition-base), transform var(--rb-transition-base);
+	border: var(--rb-border-width) solid var(--rb-color-accent);
+	transition: background var(--rb-transition-base), border-color var(--rb-transition-base);
 	background: var(--rb-color-main);
 	color: var(--rb-color-bright);
-	font-family: var(--rb-font-family, inherit);
+	font-family: inherit;
 }
 
 .selectTrigger:hover,
 .selectTrigger:focus-visible,
 .selectTrigger[aria-expanded='true'] {
-	background: color-mix(in srgb, var(--rb-color-backdrop) 65%, var(--rb-color-bright) 10%);
-}
-
-.selectTrigger:active {
-	background: color-mix(in srgb, var(--rb-color-backdrop) 70%, var(--rb-color-bright) 16%);
+	background: var(--rb-color-accent);
 }
 
 .selectTrigger .arrow {

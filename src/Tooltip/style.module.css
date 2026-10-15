@@ -3,7 +3,7 @@
 	overflow: hidden;
 	position: fixed;
 	display: inline-block;
-	border: var(--rb-border-width, 1px) solid var(--rb-color-accent);
+	border: var(--rb-border-width) solid var(--rb-color-accent);
 	background-color: var(--rb-color-main);
 	color: var(--rb-color-bright);
 	z-index: var(--rb-z-tooltip);
